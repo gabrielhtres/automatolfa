@@ -9,23 +9,16 @@ function App() {
   const [dadosTabela, setDadosTabela] = useState([]);
 
   function organizaTabela() {
-    let novosDadosTabela = [];
+    let novosDadosTabela = [...dadosTabela];
     // for(let i=0; i<linhas.length; i++) {
     //   novosDadosTabela.push([]);
     // }
 
-    let teste = [[], []];
-    teste[1][1] = 'teste';
-    console.log('teste', teste);
-
-    for(let i=0; i<colunas.length; i++) {
-      console.log('entrou no for')
-      for(let j=0; j<linhas.length; j++) {
-        novosDadosTabela[i][j] = 'teste';
+    for(let i=0; i<linhas.length; i++) {
+      for(let j=0; j<colunas.length; j++) {
+        novosDadosTabela[i][j] = <input></input>;
       }
     }
-
-    console.log('novos dados', novosDadosTabela);
 
     setDadosTabela(novosDadosTabela);
   }
@@ -34,24 +27,26 @@ function App() {
     const novasColunas = [...colunas];
     novasColunas.push(<input></input>);
     setColunas(novasColunas);
-    organizaTabela();
   }
 
   function adicionarLinha() {
     const novasLinhas = [...linhas];
-    const novosDadosTabela = [...dadosTabela];
-    console.log('dados tabela', novosDadosTabela);
-    novosDadosTabela.push([]);
     novasLinhas.push(<input></input>);
+    const novosDadosTabela = [...dadosTabela];
+    novosDadosTabela.push([]);
     setDadosTabela(novosDadosTabela);
     setLinhas(novasLinhas);
-    organizaTabela();
   }
 
   function resetarTabela() {
     setLinhas([]);
     setColunas([]);
+    setDadosTabela([]);
   }
+
+  useEffect(() => {
+    organizaTabela();
+  }, [colunas, linhas]);
 
   return (
     <div className='app'>
@@ -75,6 +70,7 @@ function App() {
           </thead>
           <tbody>
             {linhas.length > 0 ? linhas.map((item, index) => {
+              console.log(item);
               return(<tr>
                  <td>{item}</td>
                 {dadosTabela.length > 0 ? dadosTabela[index].map(item => {
