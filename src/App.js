@@ -6,17 +6,46 @@ import './App.css';
 function App() {
   const [linhas, setLinhas] = useState([]);
   const [colunas, setColunas] = useState([]);
+  const [dadosTabela, setDadosTabela] = useState([]);
+
+  function organizaTabela() {
+    let novosDadosTabela = [];
+    // for(let i=0; i<linhas.length; i++) {
+    //   novosDadosTabela.push([]);
+    // }
+
+    let teste = [[], []];
+    teste[1][1] = 'teste';
+    console.log('teste', teste);
+
+    for(let i=0; i<colunas.length; i++) {
+      console.log('entrou no for')
+      for(let j=0; j<linhas.length; j++) {
+        novosDadosTabela[i][j] = 'teste';
+      }
+    }
+
+    console.log('novos dados', novosDadosTabela);
+
+    setDadosTabela(novosDadosTabela);
+  }
 
   function adicionarColuna() {
     const novasColunas = [...colunas];
-    novasColunas.push('teste');
+    novasColunas.push(<input></input>);
     setColunas(novasColunas);
+    organizaTabela();
   }
 
   function adicionarLinha() {
     const novasLinhas = [...linhas];
-    novasLinhas.push('teste');
+    const novosDadosTabela = [...dadosTabela];
+    console.log('dados tabela', novosDadosTabela);
+    novosDadosTabela.push([]);
+    novasLinhas.push(<input></input>);
+    setDadosTabela(novosDadosTabela);
     setLinhas(novasLinhas);
+    organizaTabela();
   }
 
   function resetarTabela() {
@@ -45,13 +74,18 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {linhas.map(item => {
-                return(<tr>
+            {linhas.length > 0 ? linhas.map((item, index) => {
+              return(<tr>
+                 <td>{item}</td>
+                {dadosTabela.length > 0 ? dadosTabela[index].map(item => {
+                  return(
                   <td>
                     {item}
                   </td>
-                </tr>)
-              })}
+                  )
+                }) : undefined}
+              </tr>)
+            }) : undefined}
             </tbody>
         </table>
       </div>
