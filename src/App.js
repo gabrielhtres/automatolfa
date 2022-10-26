@@ -38,6 +38,22 @@ function App() {
     setLinhas(novasLinhas);
   }
 
+  function removerColuna() {
+    const novasColunas = [...colunas];
+    const novosDadosTabela = [...dadosTabela];
+    novasColunas.pop();
+    novosDadosTabela.map(item => {
+      return item.pop();
+    })
+    setColunas(novasColunas);
+  }
+
+  function removerLinha() {
+    const novasLinhas = [...linhas];
+    novasLinhas.pop();
+    setLinhas(novasLinhas);
+  }
+
   function resetarTabela() {
     setLinhas([]);
     setColunas([]);
@@ -54,8 +70,12 @@ function App() {
         <h1>Automato Finito</h1>
         <div className='botoes'>
           <button onClick={adicionarColuna}>Adicionar Coluna</button>
-          <button onClick={adicionarLinha}>Adicionar Linha</button>
           <button onClick={resetarTabela}>Resetar</button>
+          <button onClick={adicionarLinha}>Adicionar Linha</button>
+        </div>
+        <div className='botoes'>
+          <button onClick={removerColuna}>Remover Última Coluna</button>
+          <button onClick={removerLinha}>Remover Última Linha</button>
         </div>
         <table>
           <thead>
