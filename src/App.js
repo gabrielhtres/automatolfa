@@ -1,6 +1,4 @@
-import { Box, Button, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import FormDialog from './Modal';
 import './App.css';
 
 function App() {
@@ -60,17 +58,28 @@ function App() {
     setDadosTabela([]);
   }
 
-  function submitForm(event) {
+  function geraArrayDados() {
+    console.log('array');
+  }
+
+  function testaEntrada(event) {
     event.preventDefault();
-    console.log(event);
+    
+    if(linhas.length === 0 || colunas.length === 0) {
+      return false;
+    }
+
+    geraArrayDados();
+
   }
 
   useEffect(() => {
     organizaTabela();
+    // eslint-disable-next-line
   }, [colunas, linhas]);
 
   return (
-    <form onSubmit={submitForm} className='app'>
+    <form onSubmit={testaEntrada} className='app'>
       {/* <FormDialog /> */}
         <h1>Automato Finito</h1>
         <div className='botoes'>
