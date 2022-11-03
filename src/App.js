@@ -98,6 +98,8 @@ function App() {
 
     geraArrayDados(event);
 
+    let stringEnviada = event.target.value[event.target.value.length - 1];
+
   }
 
   useEffect(() => {
