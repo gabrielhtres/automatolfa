@@ -4,13 +4,12 @@ import './App.css';
 function App() {
   const [linhas, setLinhas] = useState([]);
   const [colunas, setColunas] = useState([]);
+  const [arrayColunas, setArrayColunas] = useState([]);
+  const [matrizLinhas, setMatrizLinhas] = useState([]);
   const [dadosTabela, setDadosTabela] = useState([]);
 
   function organizaTabela() {
     let novosDadosTabela = [...dadosTabela];
-    // for(let i=0; i<linhas.length; i++) {
-    //   novosDadosTabela.push([]);
-    // }
 
     for(let i=0; i<linhas.length; i++) {
       for(let j=0; j<colunas.length; j++) {
@@ -56,20 +55,48 @@ function App() {
     setLinhas([]);
     setColunas([]);
     setDadosTabela([]);
+    setArrayColunas([]);
+    setMatrizLinhas([]);
   }
 
-  function geraArrayDados() {
-    console.log('array');
-  }
-
-  function testaEntrada(event) {
-    event.preventDefault();
-    
+  function geraArrayDados(event) {
     if(linhas.length === 0 || colunas.length === 0) {
       return false;
     }
 
-    geraArrayDados();
+    for(let i=0; i < event.target.length; i++) {
+      if(event.target[i].type === 'text' && i < event.target.length - 2) {
+
+        if(event.target[i].name.includes('coluna')) {
+          console.log(event.target[i].name)
+          let arrayColunasAlt = arrayColunas;
+          arrayColunasAlt.push(event.target[i].value);
+          setArrayColunas(arrayColunasAlt);
+        }
+
+        if(event.target[i].name.includes('linha')) {
+          let matrizLinhasAlt = matrizLinhas;
+          matrizLinhasAlt.push([event.target[i].value]);
+          setMatrizLinhas(matrizLinhasAlt);
+        }
+
+        if(event.target[i].name.includes('-')) {
+          let posicao = event.target[i].name.split('-')[0];
+          let arrayLinhas = matrizLinhas;
+          arrayLinhas[posicao-1].push(event.target[i].value);
+          setMatrizLinhas(arrayLinhas);
+        }
+      }
+    }
+    
+    console.log('arrayColunas', arrayColunas);
+    console.log('matrizLinhas', matrizLinhas);
+  }
+
+  function testaEntrada(event) {
+    event.preventDefault();
+
+    geraArrayDados(event);
 
   }
 
@@ -80,16 +107,15 @@ function App() {
 
   return (
     <form onSubmit={testaEntrada} className='app'>
-      {/* <FormDialog /> */}
         <h1>Automato Finito</h1>
         <div className='botoes'>
-          <button onClick={adicionarColuna}>Adicionar Coluna</button>
-          <button onClick={resetarTabela}>Resetar</button>
-          <button onClick={adicionarLinha}>Adicionar Linha</button>
+          <button type="button" onClick={adicionarColuna}>Adicionar Coluna</button>
+          <button type="button" onClick={resetarTabela}>Resetar</button>
+          <button type="button" onClick={adicionarLinha}>Adicionar Linha</button>
         </div>
         <div className='botoes'>
-          <button onClick={removerColuna}>Remover Última Coluna</button>
-          <button onClick={removerLinha}>Remover Última Linha</button>
+          <button type="button" onClick={removerColuna}>Remover Última Coluna</button>
+          <button type="button" onClick={removerLinha}>Remover Última Linha</button>
         </div>
         <table>
           <thead>
@@ -104,7 +130,6 @@ function App() {
           </thead>
           <tbody>
             {linhas.length > 0 ? linhas.map((item, index) => {
-              console.log(item);
               return(<tr>
                  <td>{item}</td>
                 {dadosTabela.length > 0 ? dadosTabela[index].map(item => {
