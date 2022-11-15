@@ -145,7 +145,7 @@ function App() {
 
   return (
     <form onSubmit={testaEntrada} className='app'>
-        <h1>Automato Finito</h1>
+        <h1>Reconhecedor de Automato Finito Não Deterministico</h1>
         <div className='botoes'>
           <button type="button" onClick={adicionarColuna}>Adicionar Coluna</button>
           <button type="button" onClick={resetarTabela}>Resetar</button>
