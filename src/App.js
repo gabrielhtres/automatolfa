@@ -7,6 +7,7 @@ function App() {
   const [arrayColunas, setArrayColunas] = useState([]);
   const [matrizLinhas, setMatrizLinhas] = useState([]);
   const [dadosTabela, setDadosTabela] = useState([]);
+  const [resultado, setResultado] = useState(null);
 
   function organizaTabela() {
     let novosDadosTabela = [...dadosTabela];
@@ -57,6 +58,7 @@ function App() {
     setDadosTabela([]);
     setArrayColunas([]);
     setMatrizLinhas([]);
+    setResultado(null);
   }
 
   function geraArrayDados(event) {
@@ -68,7 +70,7 @@ function App() {
       if(event.target[i].type === 'text' && i < event.target.length - 2) {
 
         if(event.target[i].name.includes('coluna')) {
-          console.log(event.target[i].name)
+          // console.log(event.target[i].name)
           let arrayColunasAlt = arrayColunas;
           arrayColunasAlt.push(event.target[i].value);
           setArrayColunas(arrayColunasAlt);
@@ -89,16 +91,50 @@ function App() {
       }
     }
     
-    console.log('arrayColunas', arrayColunas);
-    console.log('matrizLinhas', matrizLinhas);
+    // console.log('arrayColunas', arrayColunas);
+    // console.log('matrizLinhas', matrizLinhas);
   }
 
   function testaEntrada(event) {
+    let proximaLinha = '';
+    let terminais = ['A'];
+
     event.preventDefault();
 
     geraArrayDados(event);
+    // console.log(dadosTabela);
 
-    let stringEnviada = event.target.value[event.target.value.length - 1];
+    let stringEnviada = document.getElementsByTagName('input').string.value;
+
+    console.log('string: ', stringEnviada);
+
+    for(let i=0; i<stringEnviada.length;i++) {
+      if(!arrayColunas.includes(stringEnviada[i])) {
+        setResultado(false);
+        return;
+      }
+    }
+
+    console.log(matrizLinhas);
+
+    for(let i=0; i<stringEnviada.length;i++) {
+      let indexCaractere = arrayColunas.indexOf(stringEnviada[i]);
+      console.log(indexCaractere);
+      if(i===0) {
+        proximaLinha = matrizLinhas[0][indexCaractere+1];
+        console.log(proximaLinha);
+        continue;
+      }
+
+      let linhaAtual = matrizLinhas.find(array => array[0] === proximaLinha);
+      
+      proximaLinha = linhaAtual[indexCaractere+1];
+      console.log(proximaLinha);
+    }
+
+    if(terminais.includes(proximaLinha)) {
+      setResultado(true);
+    }
 
   }
 
@@ -147,7 +183,10 @@ function App() {
         </table>
         <label htmlFor='string'>Digite sua string a ser testada:</label>
         <input name='string' className='input-string'></input>
-        <button className='botao-enviar' type='submit'>Verificar</button>
+        <button className='botao-enviar' id="submit" type='submit'>Verificar</button>
+        {resultado === null ? (<h3>Aguardando entrada</h3>) : ''}
+        {resultado === true ? <h3>String aceita</h3> : ''}
+        {resultado === false ? <h3>String recusada</h3>: ''}
       </form>
   );
 }
