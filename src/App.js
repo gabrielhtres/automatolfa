@@ -96,11 +96,54 @@ function App() {
     // console.log('matrizLinhas', matrizLinhas);
   }
 
-  function determinizaAutomato() {
-    let naoTerminaisAAdicionar = [];
+  function ajustaNovaRegra(regra) {
+    let arrayRegra = regra.split(',');
+    let arrayRegraAjustada = [];
+    let regraAjustada = '';
 
-    console.log('colunas:', arrayColunas);
-    console.log('linhas: ', matrizLinhas);
+    arrayRegra.forEach(element => {
+      if(!arrayRegraAjustada.includes(element)) {
+        arrayRegraAjustada.push(element);
+      }
+    });
+
+    arrayRegraAjustada.forEach((element, index) => {
+      if(index === 0) {
+        regraAjustada += element;
+      } else {
+        regraAjustada += `,${element}`; 
+      }
+      
+    });
+
+    return regraAjustada;
+
+  }
+
+  // function verificaNovosNaoTerminais() {
+  //   let naoTerminaisParaConferir = [];
+  //   for(let i = 0; i < matrizLinhas.length; i++) {
+  //     for(let j = 0; j < matrizLinhas[i].length; j++) {
+  //       if(matrizLinhas[i][j].length > 1 && !naoTerminaisParaConferir.includes(matrizLinhas[i][j])) {
+  //         naoTerminaisParaConferir.push(matrizLinhas[i][j])
+  //       }
+  //     }
+  //   }
+
+
+  // }
+
+  function determinizaAutomato(naoTerminaisAAdicionar) {
+    // if(naoTerminaisAAdicionar.length === 0) {
+    //   return;
+    // }
+
+    console.log('param: ', naoTerminaisAAdicionar);
+
+    let colunas = arrayColunas;
+    let novasLinhas = matrizLinhas;
+    let novosNaoTerminaisGerados = [];
+
     matrizLinhas.map(linha => {
       linha.map((item, index) => {
         if(index > 0) {
@@ -113,18 +156,49 @@ function App() {
       })
     })
 
-    let novaMatrizLinhas = matrizLinhas;
+    console.log('nao terminais add:', naoTerminaisAAdicionar)
 
     naoTerminaisAAdicionar.map((naoTerminal) => {
       let novaLinha = [];
       novaLinha.push(naoTerminal);
+      console.log('novaLinha começo: ', novaLinha);
+      
       let aConferir = naoTerminal.split(',');
-      aConferir.map(letra = > {
-        
+
+      colunas.map((estado, indexColuna) => {
+        console.log('letra: ', estado);
+        let novaRegra = '';
+        aConferir.map((letra, index) => {
+          for(let i = 0; i < matrizLinhas.length; i++) {
+            if(matrizLinhas[i][0] === letra) {
+              console.log('encontrou o estado: ', letra);
+              if(index === 0) {
+                novaRegra += matrizLinhas[i][indexColuna+1];
+                console.log(novaRegra);
+              } else {
+                  novaRegra += `,${matrizLinhas[i][indexColuna+1]}`;
+              }
+            }
+         }
+        if(!naoTerminaisAAdicionar.includes(ajustaNovaRegra(novaRegra)) &&
+           ajustaNovaRegra(novaRegra).length > 1 &&
+           !novosNaoTerminaisGerados.includes(ajustaNovaRegra(novaRegra))) {
+          novosNaoTerminaisGerados.push(ajustaNovaRegra(novaRegra));
+        }
+        });
+        novaLinha.push(ajustaNovaRegra(novaRegra));
+      })
+      novasLinhas.push(novaLinha);
       });
 
-      })
-    })
+      setMatrizLinhas(novasLinhas);
+
+      console.log('novos nao terminais:', novosNaoTerminaisGerados);
+      console.log('matriz linhas: ', matrizLinhas);
+
+      if(novosNaoTerminaisGerados.length > 0) {
+        determinizaAutomato(novosNaoTerminaisGerados);
+      }
   }
 
   function testaEntrada(event) {
@@ -133,8 +207,9 @@ function App() {
     event.preventDefault();
     
     geraArrayDados(event);
-    determinizaAutomato();
-    // // console.log(dadosTabela);
+    determinizaAutomato([]);
+
+    console.log(matrizLinhas);
 
     let stringEnviada = document.getElementsByTagName('input').string.value;
 
