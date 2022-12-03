@@ -8,6 +8,7 @@ function App() {
   const [matrizLinhas, setMatrizLinhas] = useState([]);
   const [dadosTabela, setDadosTabela] = useState([]);
   const [resultado, setResultado] = useState(null);
+  let estadosFinais = [];
 
   function organizaTabela() {
     let novosDadosTabela = [...dadosTabela];
@@ -96,6 +97,21 @@ function App() {
     // console.log('matrizLinhas', matrizLinhas);
   }
 
+  function setaEstadosFinais() {
+    let finais = [];
+    let novasLinhas = matrizLinhas;
+
+    novasLinhas.map(linha => {
+      if(linha[0].includes('*')) {
+        linha[0] = linha[0].slice(0, -1);
+        finais.push(linha[0]);
+        return linha;
+      }
+    })
+
+    estadosFinais = finais;
+  }
+
   function ajustaNovaRegra(regra) {
     let arrayRegra = regra.split(',');
     let arrayRegraAjustada = [];
@@ -119,19 +135,6 @@ function App() {
     return regraAjustada;
 
   }
-
-  // function verificaNovosNaoTerminais() {
-  //   let naoTerminaisParaConferir = [];
-  //   for(let i = 0; i < matrizLinhas.length; i++) {
-  //     for(let j = 0; j < matrizLinhas[i].length; j++) {
-  //       if(matrizLinhas[i][j].length > 1 && !naoTerminaisParaConferir.includes(matrizLinhas[i][j])) {
-  //         naoTerminaisParaConferir.push(matrizLinhas[i][j])
-  //       }
-  //     }
-  //   }
-
-
-  // }
 
   function determinizaAutomato(naoTerminaisAAdicionar) {
     // if(naoTerminaisAAdicionar.length === 0) {
@@ -202,46 +205,48 @@ function App() {
   }
 
   function testaEntrada(event) {
-    // let proximaLinha = '';
-
     event.preventDefault();
     
     geraArrayDados(event);
     determinizaAutomato([]);
+    setaEstadosFinais();
 
     console.log(matrizLinhas);
+    console.log(estadosFinais);
 
     let stringEnviada = document.getElementsByTagName('input').string.value;
+    let proximaLinha = '';
 
     // console.log('string: ', stringEnviada);
 
-    // for(let i=0; i<stringEnviada.length;i++) {
-    //   if(!arrayColunas.includes(stringEnviada[i])) {
-    //     setResultado(false);
-    //     return;
-    //   }
-    // }
+    for(let i=0; i<stringEnviada.length;i++) {
+      if(!arrayColunas.includes(stringEnviada[i])) {
+        setResultado(false);
+        return;
+      }
+    }
 
     // console.log(matrizLinhas);
 
-    // for(let i=0; i<stringEnviada.length;i++) {
-    //   let indexCaractere = arrayColunas.indexOf(stringEnviada[i]);
-    //   console.log(indexCaractere);
-    //   if(i===0) {
-    //     proximaLinha = matrizLinhas[0][indexCaractere+1];
-    //     console.log(proximaLinha);
-    //     continue;
-    //   }
-
-    //   let linhaAtual = matrizLinhas.find(array => array[0] === proximaLinha);
+    for(let i=0; i<stringEnviada.length;i++) {
+      let indexCaractere = arrayColunas.indexOf(stringEnviada[i]);
       
-    //   proximaLinha = linhaAtual[indexCaractere+1];
-    //   console.log(proximaLinha);
-    // }
+      // console.log(indexCaractere);
+      if(i===0) {
+        proximaLinha = matrizLinhas[0][indexCaractere+1];
+        // console.log(proximaLinha);
+        continue;
+      }
 
-    // if(terminais.includes(proximaLinha)) {
-    //   setResultado(true);
-    // }
+      let linhaAtual = matrizLinhas.find(array => array[0] === proximaLinha);
+      
+      proximaLinha = linhaAtual[indexCaractere+1];
+      console.log(proximaLinha);
+    }
+
+    if(estadosFinais.includes(proximaLinha)) {
+      setResultado(true);
+    }
 
   }
 
