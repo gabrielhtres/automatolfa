@@ -241,11 +241,21 @@ function App() {
       let linhaAtual = matrizLinhas.find(array => array[0] === proximaLinha);
       
       proximaLinha = linhaAtual[indexCaractere+1];
-      console.log(proximaLinha);
+
+      if(proximaLinha === '-' && estadosFinais.includes(linhaAtual[0])) {
+        setResultado(true);
+        return;
+      } 
+      
     }
+
+    console.log(proximaLinha);
+
+    
 
     if(estadosFinais.includes(proximaLinha)) {
       setResultado(true);
+      return;
     }
 
   }
