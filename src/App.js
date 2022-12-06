@@ -8,7 +8,7 @@ function App() {
   const [matrizLinhas, setMatrizLinhas] = useState([]);
   const [dadosTabela, setDadosTabela] = useState([]);
   const [resultado, setResultado] = useState(null);
-  let estadosFinais = [];
+  const [estadosFinais, setEstadosFinais] = useState([]);
 
   function organizaTabela() {
     let novosDadosTabela = [...dadosTabela];
@@ -98,24 +98,58 @@ function App() {
   }
 
   function setaEstadosFinais() {
-    let finais = [];
-    let novasLinhas = matrizLinhas;
+    let finais = estadosFinais;
 
-    novasLinhas.map(linha => {
+    console.log('matriz linhas daqui', matrizLinhas);
+    console.log('finais daqui', estadosFinais);
+
+    estadosFinais.forEach(final => {
+      matrizLinhas.forEach(linha => {
+        if(linha[0].includes(final) && linha[0].length > 1) {
+          finais.push(linha[0]);
+        }
+      })
+    }) 
+
+    console.log('novoes finais', finais);
+    setEstadosFinais(finais);
+  }
+
+  function ajustaNaoTerminaisInicial() {
+    let finais = [];
+    let novasLinhasAjustadas = matrizLinhas.map(linha => {
       if(linha[0].includes('*')) {
-        linha[0] = linha[0].slice(0, -1);
         finais.push(linha[0]);
+        linha[0] = linha[0].replace('*', '');
         return linha;
+      } else {
+        return linha;
+      }
+    });
+
+    console.log('finais dessa bosta', finais);
+    let finaisAjustados = finais.map(final => {
+      if(final.includes('*')) {
+        return final.replace('*', '');
+      } else {
+        return final;
       }
     })
 
-    estadosFinais = finais;
+    console.log('finais tirando *', finaisAjustados);
+
+    setEstadosFinais(finaisAjustados);
+    setMatrizLinhas(novasLinhasAjustadas);
+
+    return finaisAjustados;
   }
 
   function ajustaNovaRegra(regra) {
     let arrayRegra = regra.split(',');
     let arrayRegraAjustada = [];
     let regraAjustada = '';
+
+    console.log('regra pra arrumar', regra);
 
     arrayRegra.forEach(element => {
       if(!arrayRegraAjustada.includes(element)) {
@@ -125,9 +159,17 @@ function App() {
 
     arrayRegraAjustada.forEach((element, index) => {
       if(index === 0) {
-        regraAjustada += element;
+        if(element !== '-') {
+          regraAjustada += element;
+        }
       } else {
-        regraAjustada += `,${element}`; 
+        if(element !== '-') {
+          if(regraAjustada === '') {
+            regraAjustada += element;
+          } else {
+            regraAjustada += `,${element}`; 
+          }
+        }
       }
       
     });
@@ -137,10 +179,6 @@ function App() {
   }
 
   function determinizaAutomato(naoTerminaisAAdicionar) {
-    // if(naoTerminaisAAdicionar.length === 0) {
-    //   return;
-    // }
-
     console.log('param: ', naoTerminaisAAdicionar);
 
     let colunas = arrayColunas;
@@ -151,6 +189,7 @@ function App() {
       linha.map((item, index) => {
         if(index > 0) {
           if(item.length > 1) {
+            console.log('item q entrou no if', item);
             if(!naoTerminaisAAdicionar.includes(item)) {
               naoTerminaisAAdicionar.push(item);
             }
@@ -164,25 +203,27 @@ function App() {
     naoTerminaisAAdicionar.map((naoTerminal) => {
       let novaLinha = [];
       novaLinha.push(naoTerminal);
-      console.log('novaLinha começo: ', novaLinha);
       
       let aConferir = naoTerminal.split(',');
 
       colunas.map((estado, indexColuna) => {
-        console.log('letra: ', estado);
         let novaRegra = '';
         aConferir.map((letra, index) => {
           for(let i = 0; i < matrizLinhas.length; i++) {
             if(matrizLinhas[i][0] === letra) {
-              console.log('encontrou o estado: ', letra);
               if(index === 0) {
-                novaRegra += matrizLinhas[i][indexColuna+1];
-                console.log(novaRegra);
+                if(matrizLinhas[i][indexColuna+1] !== '-') {
+                  novaRegra += matrizLinhas[i][indexColuna+1];
+                }
               } else {
+                if(matrizLinhas[i][indexColuna+1] !== '-' && novaRegra !== '') {
                   novaRegra += `,${matrizLinhas[i][indexColuna+1]}`;
-              }
+                } else if(matrizLinhas[i][indexColuna+1] !== '-' && novaRegra === '') {
+                  novaRegra += matrizLinhas[i][indexColuna+1];
+                }
             }
-         }
+          }
+        }
         if(!naoTerminaisAAdicionar.includes(ajustaNovaRegra(novaRegra)) &&
            ajustaNovaRegra(novaRegra).length > 1 &&
            !novosNaoTerminaisGerados.includes(ajustaNovaRegra(novaRegra))) {
@@ -205,19 +246,19 @@ function App() {
   }
 
   function testaEntrada(event) {
+    let flagFinal = false;
     event.preventDefault();
     
     geraArrayDados(event);
+    let finais = ajustaNaoTerminaisInicial();
     determinizaAutomato([]);
     setaEstadosFinais();
 
-    console.log(matrizLinhas);
-    console.log(estadosFinais);
+    // console.log(matrizLinhas);
+    // console.log('ESTADOS FINAIS:', estadosFinais);
 
     let stringEnviada = document.getElementsByTagName('input').string.value;
     let proximaLinha = '';
-
-    // console.log('string: ', stringEnviada);
 
     for(let i=0; i<stringEnviada.length;i++) {
       if(!arrayColunas.includes(stringEnviada[i])) {
@@ -226,38 +267,39 @@ function App() {
       }
     }
 
-    // console.log(matrizLinhas);
-
     for(let i=0; i<stringEnviada.length;i++) {
       let indexCaractere = arrayColunas.indexOf(stringEnviada[i]);
       
-      // console.log(indexCaractere);
       if(i===0) {
         proximaLinha = matrizLinhas[0][indexCaractere+1];
-        // console.log(proximaLinha);
         continue;
       }
 
       let linhaAtual = matrizLinhas.find(array => array[0] === proximaLinha);
       
       proximaLinha = linhaAtual[indexCaractere+1];
-
-      if(proximaLinha === '-' && estadosFinais.includes(linhaAtual[0])) {
-        setResultado(true);
-        return;
-      } 
-      
     }
 
-    console.log(proximaLinha);
+    console.log('ultima linha', proximaLinha);
+    console.log('finais do testa entrada', finais);
 
-    
+    finais.forEach(final => {
+      console.log('cada final', final);
+      if(proximaLinha.includes(final)) {
+        
+        flagFinal = true;
+      }
+    })
 
-    if(estadosFinais.includes(proximaLinha)) {
+    console.log('linha final', proximaLinha);
+
+    if(flagFinal) {
+      console.log('entrou no if com true')
       setResultado(true);
-      return;
+    } else {
+      console.log('entrou no if com false')
+      setResultado(false);
     }
-
   }
 
   useEffect(() => {
